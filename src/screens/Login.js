@@ -14,8 +14,8 @@ import Environment from '../../Environment';
 export default class Login extends Component {
 
     state = {
-        username: '',
-        password: '',
+        usuario: '',
+        contrasenia: '',
         isLoggingIn: false,
         message: ''
     }
@@ -25,8 +25,8 @@ export default class Login extends Component {
         this.setState({ isLoggingIn: true, message: '' });
 
         var params = {
-            username: this.state.username,
-            password: this.state.password,
+            usuario: this.state.usuario,
+            contrasenia: this.state.contrasenia,
             grant_type: 'password'
         };
 
@@ -36,19 +36,20 @@ export default class Login extends Component {
             var encodedValue = encodeURIComponent(params[property]);
             formBody.push(encodedKey + "=" + encodedValue);
         }
-        formBody = formBody.join("&");
+
+        formBody = formBody.join("");
 
         var proceed = false;
-        fetch("https://"+Environment.CLIENT_API+"/oauth/token", {
+        fetch(Environment.CLIENT_API_LOGIN, {
                 method: "POST",
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/json'
                 },
                 body: formBody
             })
             .then((response) => response.json())
             .then((response) => {
-                if (response.status==200) proceed = true;
+                if (response.status) proceed = true;
                 else this.setState({ message: response.message });
             })
             .then(() => {
@@ -62,12 +63,12 @@ export default class Login extends Component {
     }
 
     clearUsername = () => {
-        this._username.setNativeProps({ text: '' });
+        this._usuario.setNativeProps({ text: '' });
         this.setState({ message: '' });
     }
 
     clearPassword = () => {
-        this._password.setNativeProps({ text: '' });
+        this._contrasenia.setNativeProps({ text: '' });
         this.setState({ message: '' });
     }
 
@@ -79,16 +80,16 @@ export default class Login extends Component {
 					Login
 				</Text>
 				<TextInput
-					ref={component => this._username = component}
-					placeholder='Username' 
-					onChangeText={(username) => this.setState({username})}
+					ref={component => this._usuario = component}
+					placeholder='Usuario' 
+					onChangeText={(usuario) => this.setState({usuario})}
 					autoFocus={true}
 					onFocus={this.clearUsername}
 				/>
 				<TextInput 
-					ref={component => this._password = component}
-					placeholder='Password' 
-					onChangeText={(password) => this.setState({password})}
+					ref={component => this._contrasenia = component}
+					placeholder='Contraseña' 
+					onChangeText={(contrasenia) => this.setState({contrasenia})}
 					secureTextEntry={true}
 					onFocus={this.clearPassword}
 					onSubmitEditing={this._userLogin}
@@ -102,7 +103,7 @@ export default class Login extends Component {
 				{this.state.isLoggingIn && <ActivityIndicator />}
 				<View style={{margin:7}} />
 				<Button 
-					disabled={this.state.isLoggingIn||!this.state.username||!this.state.password}
+					disabled={this.state.isLoggingIn||!this.state.usuario||!this.state.contrasenia}
 		      		onPress={this._userLogin}
 		      		title="Submit"
 		      	/>
