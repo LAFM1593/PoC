@@ -27,39 +27,34 @@ export default class Login extends Component {
         var params = {
             usuario: this.state.usuario,
             contrasenia: this.state.contrasenia,
-            grant_type: 'password'
         };
-
-        var formBody = [];
-        for (var property in params) {
-            var encodedKey = encodeURIComponent(property);
-            var encodedValue = encodeURIComponent(params[property]);
-            formBody.push(encodedKey + "=" + encodedValue);
-        }
-
-        formBody = formBody.join("");
-
         var proceed = false;
         fetch(Environment.CLIENT_API_LOGIN, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: formBody
+                body: JSON.stringify(params)
             })
             .then((response) => response.json())
             .then((response) => {
-                if (response.status) proceed = true;
-                else this.setState({ message: response.message });
+                if (response.status)
+                  proceed = true;
+                else
+                  this.setState({ message: response.message });
             })
             .then(() => {
                 this.setState({ isLoggingIn: false })
-                if (proceed) this.props.onLoginPress();
+                if (proceed){
+                  this.clearPassword;
+                  this.clearUsername;
+                  this.props.onLoginPress();
+                }
             })
             .catch(err => {
-				this.setState({ message: err.message });
-				this.setState({ isLoggingIn: false })
-			});
+				          this.setState({ message: err.message });
+				          this.setState({ isLoggingIn: false })
+			      });
     }
 
     clearUsername = () => {
@@ -75,40 +70,38 @@ export default class Login extends Component {
     render() {
         return (
             <ScrollView style={{padding: 20}}>
-				<Text 
-					style={{fontSize: 27}}>
-					Login
-				</Text>
-				<TextInput
-					ref={component => this._usuario = component}
-					placeholder='Usuario' 
-					onChangeText={(usuario) => this.setState({usuario})}
-					autoFocus={true}
-					onFocus={this.clearUsername}
-				/>
-				<TextInput 
-					ref={component => this._contrasenia = component}
-					placeholder='Contraseña' 
-					onChangeText={(contrasenia) => this.setState({contrasenia})}
-					secureTextEntry={true}
-					onFocus={this.clearPassword}
-					onSubmitEditing={this._userLogin}
-				/>
-				{!!this.state.message && (
-					<Text
-						style={{fontSize: 14, color: 'red', padding: 5}}>
-						{this.state.message}
-					</Text>
-				)}
-				{this.state.isLoggingIn && <ActivityIndicator />}
-				<View style={{margin:7}} />
-				<Button 
-					disabled={this.state.isLoggingIn||!this.state.usuario||!this.state.contrasenia}
-		      		onPress={this._userLogin}
-		      		title="Submit"
-		      	/>
-	      </ScrollView>
+    				<Text
+    					style={{fontSize: 27}}>
+    					Login
+    				</Text>
+    				<TextInput
+    					ref={component => this._usuario = component}
+    					placeholder='Usuario'
+    					onChangeText={(usuario) => this.setState({usuario})}
+    					autoFocus={true}
+    					//onFocus={this.clearUsername}
+    				/>
+    				<TextInput
+    					ref={component => this._contrasenia = component}
+    					placeholder='Contraseña'
+    					onChangeText={(contrasenia) => this.setState({contrasenia})}
+    					secureTextEntry={true}
+    					//onFocus={this.clearPassword}
+    					onSubmitEditing={this._userLogin}
+    				/>
+    				{!!this.state.message && (
+    					<Text
+    						style={{fontSize: 14, color: 'red', padding: 5}}>
+    						{this.state.message}
+    					</Text>
+    				)}
+    				{this.state.isLoggingIn && <ActivityIndicator />}
+    				<View style={{margin:7}} />
+    				<Button
+    					   disabled={this.state.isLoggingIn||!this.state.usuario||!this.state.contrasenia}
+    		      		onPress={this._userLogin}
+    		      		title="Iniciar Sessión"/>
+    	      </ScrollView>
         )
     }
 }
-
